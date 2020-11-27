@@ -1,12 +1,13 @@
 #https://stackoverflow.com/questions/45538826/decoding-sequences-in-a-gaussianhmm
-#5개를 보고 그 다음 6번재를 예측하는 방법. 
-
 import numpy as np
 import pandas as pd
 
 df = pd.read_csv('./팀플 데이터/in_total.csv', index_col='date')
 n_feat = 3
 df.head()
+df.min() #9
+df.max() #110377
+df.mean() #29779
 
 #train, test 나누기
 train_x= df[df.index < '2020-01-01']
@@ -39,7 +40,7 @@ for start in range(len(test_x)-span):
     end = start + span
     first_five = test_x.iloc[start:end].values
     output = []
-    for a in np.arange(-0.05,0.05,.01):
+    for a in np.arange(10000,100000,10):
         sixth = np.array([a])[:, np.newaxis].T
         all_six = np.append(first_five, sixth, axis=0)
         output.append((mdl.decode(all_six), (a)))
@@ -68,6 +69,6 @@ for start in range(len(test_x)-span):
         print("Test sequence StartIx: {}, EndIx: {}".format(start, end))
         print("Best 6th value: {}".format(best_dict["sixth"]))
         print("Predicted hidden state sequence: {}".format(best_dict["preds"]))
-        print("Likelihood: {}\n".format(best_dict["nLL"]))
+        print("Likelihood: {}\n".format(best_dict["lik"]))
 
 print(best_per_span)
