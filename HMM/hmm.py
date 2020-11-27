@@ -1,3 +1,36 @@
+"""
+#https://datascienceschool.net/03%20machine%20learning/20.01%20%ED%9E%88%EB%93%A0%20%EB%A7%88%EC%BD%94%ED%94%84%20%EB%AA%A8%ED%98%95.html
+import numpy as np
+from hmmlearn import hmm
+np.random.seed(3)
+import matplotlib.pyplot as plt
+
+model = hmm.GaussianHMM(n_components=2, covariance_type="diag")
+model.startprob_ = np.array([0.9, 0.1])
+model.transmat_ = np.array([[0.95, 0.05], [0.15, 0.85]])
+model.means_ = np.array([[1.0], [-3.0]])
+model.covars_ = np.array([[15.0], [40.0]])
+X, Z = model.sample(500)
+
+#decode
+model2 = hmm.GaussianHMM(n_components=2, n_iter=len(X)).fit(X)
+Z_hat = model2.decode(X)[1]
+X_cum = (1 + 0.01*X).cumprod()
+X_cum_hat = X_cum.copy()
+X_cum_hat[Z_hat == 0] = np.nan
+
+plt.subplot(211)
+plt.plot(X_cum, lw=5)
+plt.plot(X_cum_hat, 'r-', lw=5)
+plt.title("X cumulated")
+plt.subplot(212)
+plt.plot(Z, 'bo-')
+plt.plot(Z_hat, 'ro-')
+plt.title("discrete state")
+plt.tight_layout()
+plt.show()
+"""
+
 #https://stackoverflow.com/questions/45538826/decoding-sequences-in-a-gaussianhmm
 import numpy as np
 import pandas as pd
@@ -70,5 +103,10 @@ for start in range(len(test_x)-span):
         print("Best 6th value: {}".format(best_dict["sixth"]))
         print("Predicted hidden state sequence: {}".format(best_dict["preds"]))
         print("Likelihood: {}\n".format(best_dict["lik"]))
+ 
+#predict 된 값들
+final_sixth =[]
+for i in range(len(best_per_span)):
+    final_sixth.append(best_per_span[i]["sixth"])
 
-print(best_per_span)
+final_sixth
